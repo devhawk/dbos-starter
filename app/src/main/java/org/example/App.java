@@ -55,10 +55,6 @@ public class App {
   private static final Logger logger = LoggerFactory.getLogger(App.class);
   private static final AtomicReference<String> indexHtmlContent = new AtomicReference<>(null);
 
-  public String getGreeting() {
-    return "Hello World!";
-  }
-
   public static void main(String[] args) {
 
     var dbUrl = System.getenv("DBOS_SYSTEM_JDBC_URL");
