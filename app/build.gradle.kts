@@ -1,0 +1,44 @@
+plugins {
+    application
+    id("com.diffplug.spotless") version "8.3.0"
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    implementation("io.javalin:javalin:7.0.1")
+    implementation(libs.guava)
+    implementation("dev.dbos:transact:0.8.0-a49-g70a00aa")
+    implementation("org.slf4j:slf4j-simple:2.0.17")
+
+    testImplementation(libs.junit.jupiter)
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.mockito:mockito-core:5.22.0")
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+spotless {
+    java {
+        googleJavaFormat()
+        importOrder("dev.dbos", "java", "javax", "")
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        endWithNewline()
+    }
+}
+
+application {
+    mainClass = "org.example.App"
+}
+
+tasks.named<Test>("test") {
+    useJUnitPlatform()
+}
