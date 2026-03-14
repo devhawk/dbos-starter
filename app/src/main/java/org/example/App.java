@@ -5,10 +5,8 @@ import dev.dbos.transact.StartWorkflowOptions;
 import dev.dbos.transact.config.DBOSConfig;
 import dev.dbos.transact.workflow.Workflow;
 
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 import io.javalin.Javalin;
 import org.slf4j.Logger;
@@ -53,7 +51,6 @@ class DurableStarterServiceImpl implements DurableStarterService {
 
 public class App {
   private static final Logger logger = LoggerFactory.getLogger(App.class);
-  private static final AtomicReference<String> indexHtmlContent = new AtomicReference<>(null);
 
   public static void main(String[] args) {
 
@@ -81,9 +78,15 @@ public class App {
         Javalin.create(
                 config -> {
                   config.startup.showJavalinBanner = false;
+                  // config.staticFiles.add("/public");
                   config.events.serverStarting(() -> dbos.launch());
                   config.events.serverStopping(() -> dbos.shutdown());
-                  config.routes.get("/", ctx -> ctx.html(indexHtml()));
+                  config.routes.get(
+                      "/",
+                      ctx -> {
+                        ctx.contentType("text/html");
+                        ctx.result(App.class.getResourceAsStream("/index.html"));
+                      });
                   config.routes.get(
                       "/workflow/{taskId}",
                       ctx -> {
@@ -113,28 +116,5 @@ public class App {
                       });
                 })
             .start(7070);
-  }
-
-  private static String indexHtml() {
-    String content = indexHtmlContent.get();
-    if (content == null) {
-      String newContent;
-      try (var html = App.class.getResourceAsStream("/index.html")) {
-        if (html != null) {
-          newContent = new String(html.readAllBytes(), StandardCharsets.UTF_8);
-        } else {
-          logger.error("HTML file not found");
-          newContent = "<html><body><h1>Error: HTML file not found</h1></body></html>";
-        }
-      } catch (Exception e) {
-        logger.error("Error reading HTML file", e);
-        newContent = "<html><body><h1>Error loading page</h1></body></html>";
-      }
-
-      // Only set if still null (other thread might have set it)
-      indexHtmlContent.compareAndSet(null, newContent);
-      return indexHtmlContent.get();
-    }
-    return content;
   }
 }

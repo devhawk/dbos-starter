@@ -45,7 +45,6 @@ spotless {
     trimTrailingWhitespace()
     endWithNewline()
   }
-
   kotlin {
     target("src/**/*.kt")
     targetExclude("build/**/*.kt")
