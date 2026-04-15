@@ -9,8 +9,9 @@ repositories { mavenCentral() }
 configurations { create("mockitoAgent") }
 
 dependencies {
+  implementation("dev.dbos:transact:0.8.+") // TODO: update when released
+
   implementation("io.javalin:javalin:7.0.1")
-  implementation("dev.dbos:transact:0.8.+")
   implementation("org.slf4j:slf4j-simple:2.0.17")
 
   testImplementation(libs.junit.jupiter)
@@ -21,7 +22,7 @@ dependencies {
   add("mockitoAgent", "net.bytebuddy:byte-buddy-agent:1.17.7")
 }
 
-java { toolchain { languageVersion = JavaLanguageVersion.of(21) } }
+java { toolchain { languageVersion = JavaLanguageVersion.of(17) } }
 
 tasks.test {
   // Configure Mockito agent to avoid self-attaching warnings

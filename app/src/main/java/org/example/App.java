@@ -71,7 +71,7 @@ public class App {
     var dbos = new DBOS(dbosConfig);
 
     var proxy =
-        dbos.registerWorkflows(DurableStarterService.class, new DurableStarterServiceImpl(dbos));
+        dbos.registerProxy(DurableStarterService.class, new DurableStarterServiceImpl(dbos));
 
     @SuppressWarnings("unused")
     var app =
@@ -100,12 +100,12 @@ public class App {
                       ctx -> {
                         var taskId = ctx.pathParam("taskId");
                         var step =
-                            (Integer)
-                                dbos.getEvent(
+                            dbos.<Integer>getEvent(
                                     taskId,
                                     DurableStarterServiceImpl.STEPS_EVENT,
-                                    Duration.ofSeconds(0));
-                        ctx.result(String.valueOf(step != null ? step : 0));
+                                    Duration.ofSeconds(0))
+                                .orElse(0);
+                        ctx.result(String.valueOf(step));
                       });
                   config.routes.post(
                       "/crash",
